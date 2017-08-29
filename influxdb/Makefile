@@ -19,15 +19,9 @@ endif
 PKG_TARBALL := influxdb-$(PKG_VERSION)$(PKG_STATIC)_linux_$(PKG_DOWNLOAD_ARCH).tar.gz
 INFLUXDB_URL := https://dl.influxdata.com/influxdb/releases/$(PKG_TARBALL)
 
-PKG_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PKG_ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 include $(PKG_ROOT_DIR)/../mk/package.mk
-
-
-all: build install package
-
-# Fetch retrieves desired version from web
-fetch: $(TARBALL_DIR)/$(PKG_TARBALL)
 
 $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR)
 	@echo "Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
@@ -41,7 +35,9 @@ $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR)
 build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 
 # Install copies files into target directory
-install: $(TARBALL_DIR)/$(PKG_TARBALL)
+install: $(INNER_PKG_DIR)
+
+$(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
 	rm -rf $(INNER_PKG_DIR)
 	install -d $(INNER_PKG_DIR)
 	install -d $(INNER_PKG_DIR)/bin

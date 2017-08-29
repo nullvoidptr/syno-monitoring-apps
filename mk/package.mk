@@ -69,7 +69,7 @@ fetch: $(TARBALL_DIR)/$(PKG_TARBALL)
 build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 
 # Create the inner package tarball from contents of INNER_PKG_DIR
-$(BUILD_DIR)/package.tgz: $(shell ls $(INNER_PKG_DIR) 2>/dev/null)
+$(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
 	tar czf $@ -C $(INNER_PKG_DIR) .
 
 # Create the INFO file
@@ -117,4 +117,4 @@ clean-all:
 dist-clean: clean-all
 	rm -rf $(TARBALL_DIR)
 
-.PHONY: all clean build fetch package dist-clean dump-vars
+.PHONY: all clean build install fetch package dist-clean dump-vars
