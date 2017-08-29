@@ -30,9 +30,13 @@ PKG_ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 include $(PKG_ROOT_DIR)/../mk/package.mk
 
+ifneq ($(BUILD_VERBOSE),1)
+WGET_QUIET:="--quiet"
+endif
+
 $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR)
 	@echo " - Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
-	$(Q) wget -O $(TARBALL_DIR)/$(PKG_TARBALL) $(INFLUXDB_URL)
+	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL) $(INFLUXDB_URL)
 	@# wget sets modify time to time fetched from server
 	@# 'touch' the file to ensure make handles updated file correctly
 	@# otherwise will download each time make is run
