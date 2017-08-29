@@ -70,8 +70,8 @@ INNER_PKG_DIR := $(BUILD_DIR)/_inner_
 OUTER_PKG_DIR := $(BUILD_DIR)/_outer_
 PKG_INFO_FILE := $(BUILD_DIR)/INFO
 
-PKG_SCRIPT_DIR := $(PKG_ROOT_DIR)/scripts
-PKG_SCRIPT_FILES := $(shell ls $(PKG_SCRIPT_DIR)/*)
+_REQUIRED_SCRIPTS:= preinst postinst preuninst postuninst preupgrade postupgrade start-stop-status
+PKG_SCRIPT_FILES := $(addprefix $(PKG_ROOT_DIR)/scripts/, $(_REQUIRED_SCRIPTS))
 PKG_ICON_FILES := $(shell ls $(PKG_ROOT_DIR)/icons/PACKAGE_ICON*.PNG)
 PKG_CONF_FILES := $(shell ls $(PKG_ROOT_DIR)/conf/*)
 PKG_WIZARD_FILES := $(shell ls $(PKG_ROOT_DIR)/wizard/*)
@@ -97,6 +97,10 @@ $(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
 	@echo " - Generating package.tgz"
 	$(Q) tar czf $@ -C $(INNER_PKG_DIR) .
 
+# Print a better error if script is missing.
+$(PKG_SCRIPT_FILES):
+	@:$(error Required package script '$(@F)' not found)
+
 # Create the INFO file
 $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 	@echo " - Generating INFO file"
@@ -112,7 +116,7 @@ $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 .PHONY: $(PKG_INFO_FILE)
 
 
-# Build to .spk package
+# Build the .spk package
 package: $(DEST_PACKAGE)
 
 $(DEST_PACKAGE): $(BUILD_DIR)/package.tgz $(PKG_SCRIPT_FILES) $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(PKG_CONF_FILES) $(PKG_WIZARD_FILES)
@@ -152,4 +156,4 @@ clean-all:
 dist-clean: clean-all
 	$(Q) rm -rf $(TARBALL_DIR)
 
-.PHONY: all clean build install fetch package dist-clean dump-vars
+.PHONY: all clean build install fetch package dist-clean dump-vars verify-pkg-contents
