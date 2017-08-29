@@ -12,6 +12,15 @@ endef
 $(foreach var,$(_REQUIRED_VARS),$(eval $(call _CHECK_VARIABLE,$(var))))
 
 #
+# Control verbosity of output via BUILD_VERBOSE variable
+#
+ifeq ($(BUILD_VERBOSE),1)
+Q:=
+else
+Q:=@
+endif
+
+#
 # Functions for dumping values of local variables
 #
 # Calling package makefiles can assign additional variables to list
@@ -30,7 +39,6 @@ endef
 # will be a lowercase version of the suffix following PKG_INFO_
 #
 _PKG_INFO_VARS = $(sort $(filter-out PKG_INFO_FILE,$(filter PKG_INFO_%,$(.VARIABLES))))
-$(info _PKG_INFO_VARS = $(_PKG_INFO_VARS))
 
 # Write a single field to given file
 define _WRITE_PKG_INFO_FIELD =
@@ -86,17 +94,19 @@ build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 
 # Create the inner package tarball from contents of INNER_PKG_DIR
 $(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
-	tar czf $@ -C $(INNER_PKG_DIR) .
+	@echo " - Generating package.tgz"
+	$(Q) tar czf $@ -C $(INNER_PKG_DIR) .
 
 # Create the INFO file
 $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
-	echo "package=\"$(PKG_NAME)\"" > $(PKG_INFO_FILE)
-	echo "version=\"$(PKG_VERSION_FULL)\"" >> $(PKG_INFO_FILE)
-	echo "arch=\"$(PKG_PLATFORMS)\"" >> $(PKG_INFO_FILE)
-	$(call _WRITE_PKG_INFO,$(PKG_INFO_FILE))
-	size=$$(du -s $(INNER_PKG_DIR) | cut -f1); \
+	@echo " - Generating INFO file"
+	$(Q) echo "package=\"$(PKG_NAME)\"" > $(PKG_INFO_FILE)
+	$(Q) echo "version=\"$(PKG_VERSION_FULL)\"" >> $(PKG_INFO_FILE)
+	$(Q) echo "arch=\"$(PKG_PLATFORMS)\"" >> $(PKG_INFO_FILE)
+	$(Q) $(call _WRITE_PKG_INFO,$(PKG_INFO_FILE))
+	$(Q) size=$$(du -s $(INNER_PKG_DIR) | cut -f1); \
 	  echo "extractsize=$$size" >> $(PKG_INFO_FILE)
-	echo "create_time=\"$$(date "+%Y%m%d-%H:%M:%S")\"" >> $(PKG_INFO_FILE)
+	$(Q) echo "create_time=\"$$(date "+%Y%m%d-%H:%M:%S")\"" >> $(PKG_INFO_FILE)
 
 # To ensure INFO file is always accurate we must force rebuild each time
 .PHONY: $(PKG_INFO_FILE)
@@ -106,39 +116,40 @@ $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 package: $(DEST_PACKAGE)
 
 $(DEST_PACKAGE): $(BUILD_DIR)/package.tgz $(PKG_SCRIPT_FILES) $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(PKG_CONF_FILES) $(PKG_WIZARD_FILES)
-	rm -rf $(OUTER_PKG_DIR)
-	install -d $(OUTER_PKG_DIR)
-	install -d $(OUTER_PKG_DIR)/scripts
-	install -m 755 $(PKG_SCRIPT_FILES) $(OUTER_PKG_DIR)/scripts
-	install -m 644 $(BUILD_DIR)/package.tgz $(OUTER_PKG_DIR)
-	if [ -n "$(PKG_ICON_FILES)" ]; then \
+	@echo " - Building $(DEST_PACKAGE)"
+	$(Q) rm -rf $(OUTER_PKG_DIR)
+	$(Q) install -d $(OUTER_PKG_DIR)
+	$(Q) install -d $(OUTER_PKG_DIR)/scripts
+	$(Q) install -m 755 $(PKG_SCRIPT_FILES) $(OUTER_PKG_DIR)/scripts
+	$(Q) install -m 644 $(BUILD_DIR)/package.tgz $(OUTER_PKG_DIR)
+	$(Q) if [ -n "$(PKG_ICON_FILES)" ]; then \
 		install -m 644 $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(OUTER_PKG_DIR); \
 	fi
-	if [ -n "$(PKG_CONF_FILES)" ]; then \
+	$(Q) if [ -n "$(PKG_CONF_FILES)" ]; then \
 	  install -d $(OUTER_PKG_DIR)/conf; \
 	  install -m 644 $(PKG_CONF_FILES) $(OUTER_PKG_DIR)/conf; \
 	fi
-	if [ -n "$(PKG_WIZARD_FILES)" ]; then \
+	$(Q) if [ -n "$(PKG_WIZARD_FILES)" ]; then \
 	  install -d $(OUTER_PKG_DIR)/WIZARD_UIFILES; \
 	  install -m 755 $(PKG_WIZARD_FILES) $(OUTER_PKG_DIR)/WIZARD_UIFILES; \
 	fi
-	tar czf $@ -C $(OUTER_PKG_DIR) $$(ls $(OUTER_PKG_DIR))
+	$(Q) tar czf $@ -C $(OUTER_PKG_DIR) $$(ls $(OUTER_PKG_DIR))
 
 dump-vars:
 	@:$(call _DUMP_VARIABLES)
 
 # Create build directory
 $(BUILD_DIR) $(TARBALL_DIR):
-	@if [ ! -d "$@" ]; then mkdir -p "$@"; fi
-	@if [ ! -f "$@/.gitignore" ]; then echo "*" > "$@/.gitignore"; fi
+	$(Q) if [ ! -d "$@" ]; then mkdir -p "$@"; fi
+	$(Q) if [ ! -f "$@/.gitignore" ]; then echo "*" > "$@/.gitignore"; fi
 
 clean:
-	rm -rf $(BUILD_DIR)/*
+	$(Q) rm -rf $(BUILD_DIR)/*
 
 clean-all:
-	rm -rf $(PKG_ROOT_DIR)/.build
+	$(Q) rm -rf $(PKG_ROOT_DIR)/.build
 
 dist-clean: clean-all
-	rm -rf $(TARBALL_DIR)
+	$(Q) rm -rf $(TARBALL_DIR)
 
 .PHONY: all clean build install fetch package dist-clean dump-vars

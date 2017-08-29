@@ -31,12 +31,12 @@ PKG_ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 include $(PKG_ROOT_DIR)/../mk/package.mk
 
 $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR)
-	@echo "Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
-	@wget -O $(TARBALL_DIR)/$(PKG_TARBALL) $(INFLUXDB_URL)
+	@echo " - Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
+	$(Q) wget -O $(TARBALL_DIR)/$(PKG_TARBALL) $(INFLUXDB_URL)
 	@# wget sets modify time to time fetched from server
 	@# 'touch' the file to ensure make handles updated file correctly
 	@# otherwise will download each time make is run
-	@touch $(TARBALL_DIR)/$(PKG_TARBALL)
+	$(Q) touch $(TARBALL_DIR)/$(PKG_TARBALL)
 
 # Build is a no-op as we download pre-compiled binaries from the web
 build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
@@ -45,10 +45,11 @@ build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 install: $(INNER_PKG_DIR)
 
 $(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
-	rm -rf $(INNER_PKG_DIR)
-	install -d $(INNER_PKG_DIR)
-	install -d $(INNER_PKG_DIR)/bin
-	tar_root=$$(tar tzf $(TARBALL_DIR)/$(PKG_TARBALL) | grep "/[^/]*/$$" | head -n1); \
+	@echo " - Installing $(PKG_NAME) to temp directory"
+	$(Q) rm -rf $(INNER_PKG_DIR)
+	$(Q) install -d $(INNER_PKG_DIR)
+	$(Q) install -d $(INNER_PKG_DIR)/bin
+	$(Q) tar_root=$$(tar tzf $(TARBALL_DIR)/$(PKG_TARBALL) | grep "/[^/]*/$$" | head -n1); \
 	  tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -O  $${tar_root}usr/bin/influxd > $(INNER_PKG_DIR)/bin/influxd; \
 	  tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -O  $${tar_root}usr/bin/influx > $(INNER_PKG_DIR)/bin/influx
-	chmod 755 $(INNER_PKG_DIR)/bin/influx*
+	$(Q) chmod 755 $(INNER_PKG_DIR)/bin/influx*
