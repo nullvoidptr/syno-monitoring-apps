@@ -1,16 +1,23 @@
 # InfluxDB Makefile
 
-
 PKG_NAME := influxDB
-PKG_DISPLAY_NAME := "InfluxDB"
-PKG_MAINTAINER := "James Bowen"
-PKG_DESCRIPTION := "InfluxDB is used as a data store for any use case involving large amounts of timestamped data, including DevOps monitoring, application metrics, IoT sensor data, and real-time analytics."
 
 # Override via environment to build other version/arch
 PKG_VERSION ?= 1.3.4
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
 PKG_RELEASE := beta1
+
+# NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
+PKG_INFO_DISPLAYNAME := "InfluxDB"
+PKG_INFO_MAINTAINER := "James Bowen"
+PKG_INFO_DESCRIPTION := \
+	"InfluxDB is used as a data store for any use case involving large amounts \
+	 of timestamped data, including DevOps monitoring, application metrics, IoT \
+	 sensor data, and real-time analytics."
+
+# Require 6.0-5914 to support data share resource
+# PKG_INFO_OS_MIN_VER := 6.0-5914
 
 ifeq ($(PKG_ARCH),x86_64)
     PKG_DOWNLOAD_ARCH := amd64

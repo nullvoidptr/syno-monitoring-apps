@@ -24,8 +24,24 @@ define _DUMP_VARIABLES =
 $(foreach var,$(_LOCAL_VARS) $(_PKG_LOCAL_VARS),$(info $(var): $(value $(var))))
 endef
 
+#
+# PKG_INFO_* variables allow package makefiles to define additional
+# fields to be written into INFO file during packaging. The field name
+# will be a lowercase version of the suffix following PKG_INFO_
+#
+_PKG_INFO_VARS = $(sort $(filter-out PKG_INFO_FILE,$(filter PKG_INFO_%,$(.VARIABLES))))
+$(info _PKG_INFO_VARS = $(_PKG_INFO_VARS))
 
-# $(error STOP)
+# Write a single field to given file
+define _WRITE_PKG_INFO_FIELD =
+field=$$(echo '$(1)' | sed -e 's/^PKG_INFO_//' | tr A-Z a-z); \
+echo $${field}='$(value $(1))' >> $(2);
+endef
+
+# Write all PKG_INFO_* vars to INFO file
+define _WRITE_PKG_INFO =
+$(foreach var,$(_PKG_INFO_VARS),$(call _WRITE_PKG_INFO_FIELD,$(var),$(1)))
+endef
 
 ifdef PKG_RELEASE
     PKG_VERSION_FULL:=$(PKG_VERSION)-$(PKG_RELEASE)
@@ -73,13 +89,12 @@ $(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
 	tar czf $@ -C $(INNER_PKG_DIR) .
 
 # Create the INFO file
+.PHONY: $(PKG_INFO_FILE)
 $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 	echo "package=\"$(PKG_NAME)\"" > $(PKG_INFO_FILE)
-	echo "displayname=\"$(PKG_DISPLAY_NAME)\"" >> $(PKG_INFO_FILE)
-	echo "maintainer=\"$(PKG_MAINTAINER)\"" >> $(PKG_INFO_FILE)
-	echo "description=\"$(PKG_DESCRIPTION)\"" >> $(PKG_INFO_FILE)
 	echo "version=\"$(PKG_VERSION_FULL)\"" >> $(PKG_INFO_FILE)
 	echo "arch=\"$(PKG_PLATFORMS)\"" >> $(PKG_INFO_FILE)
+	$(call _WRITE_PKG_INFO,$(PKG_INFO_FILE))
 	size=$$(du -s $(INNER_PKG_DIR) | cut -f1); \
 	  echo "extractsize=$$size" >> $(PKG_INFO_FILE)
 	echo "create_time=\"$$(date "+%Y%m%d-%H:%M:%S")\"" >> $(PKG_INFO_FILE)
