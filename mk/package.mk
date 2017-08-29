@@ -89,7 +89,6 @@ $(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
 	tar czf $@ -C $(INNER_PKG_DIR) .
 
 # Create the INFO file
-.PHONY: $(PKG_INFO_FILE)
 $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 	echo "package=\"$(PKG_NAME)\"" > $(PKG_INFO_FILE)
 	echo "version=\"$(PKG_VERSION_FULL)\"" >> $(PKG_INFO_FILE)
@@ -99,19 +98,29 @@ $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 	  echo "extractsize=$$size" >> $(PKG_INFO_FILE)
 	echo "create_time=\"$$(date "+%Y%m%d-%H:%M:%S")\"" >> $(PKG_INFO_FILE)
 
+# To ensure INFO file is always accurate we must force rebuild each time
+.PHONY: $(PKG_INFO_FILE)
+
+
+# Build to .spk package
 package: $(DEST_PACKAGE)
 
 $(DEST_PACKAGE): $(BUILD_DIR)/package.tgz $(PKG_SCRIPT_FILES) $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(PKG_CONF_FILES) $(PKG_WIZARD_FILES)
+	rm -rf $(OUTER_PKG_DIR)
 	install -d $(OUTER_PKG_DIR)
 	install -d $(OUTER_PKG_DIR)/scripts
 	install -m 755 $(PKG_SCRIPT_FILES) $(OUTER_PKG_DIR)/scripts
 	install -m 644 $(BUILD_DIR)/package.tgz $(OUTER_PKG_DIR)
-	install -m 644 $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(OUTER_PKG_DIR)
-	install -d $(OUTER_PKG_DIR)/conf
-	install -m 644 $(PKG_CONF_FILES) $(OUTER_PKG_DIR)/conf
+	if [ -n "$(PKG_ICON_FILES)" ]; then \
+		install -m 644 $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(OUTER_PKG_DIR); \
+	fi
+	if [ -n "$(PKG_CONF_FILES)" ]; then \
+	  install -d $(OUTER_PKG_DIR)/conf; \
+	  install -m 644 $(PKG_CONF_FILES) $(OUTER_PKG_DIR)/conf; \
+	fi
 	if [ -n "$(PKG_WIZARD_FILES)" ]; then \
-	  install -d $(OUTER_PKG_DIR)/PKG_WIZARD_FILES; \
-	  install -m 755 $(PKG_WIZARD_FILES) $(OUTER_PKG_DIR)/PKG_WIZARD_FILES; \
+	  install -d $(OUTER_PKG_DIR)/WIZARD_UIFILES; \
+	  install -m 755 $(PKG_WIZARD_FILES) $(OUTER_PKG_DIR)/WIZARD_UIFILES; \
 	fi
 	tar czf $@ -C $(OUTER_PKG_DIR) $$(ls $(OUTER_PKG_DIR))
 
