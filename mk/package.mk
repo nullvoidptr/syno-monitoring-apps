@@ -148,12 +148,15 @@ $(BUILD_DIR) $(TARBALL_DIR):
 	$(Q) if [ ! -f "$@/.gitignore" ]; then echo "*" > "$@/.gitignore"; fi
 
 clean:
+	@echo " - Removing build artifacts"
 	$(Q) rm -rf $(BUILD_DIR)/*
 
 clean-all:
+	@echo " - Removing build artifacts (all versions)"
 	$(Q) rm -rf $(PKG_ROOT_DIR)/.build
 
 dist-clean: clean-all
+	@echo " - Removing downloaded tarball(s)"
 	$(Q) rm -rf $(TARBALL_DIR)
 
 .PHONY: all clean build install fetch package dist-clean dump-vars verify-pkg-contents
