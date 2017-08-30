@@ -2,16 +2,27 @@
 
 PACKAGES:=influxdb
 
+ifneq ($(BUILD_VERBOSE),1)
+MAKE_OPTS:=--no-print-directory
+endif
+
 # Build all packages
 all: $(PACKAGES)
 
-clean dist-clean:
+clean clean-all dist-clean:
 	@for pkg in $(PACKAGES); do \
-	  $(MAKE) -C $$pkg $@; \
+	  $(MAKE) $(MAKE_OPTS) $$pkg-$@; \
 	done
 
-# Run make in target package directory
+# Run make all in target package directory
 $(PACKAGES):
-	@$(MAKE) -C $@
+	@$(MAKE) $(MAKE_OPTS) $@-all
 
-.PHONY: all clean $(PACKAGES)
+# Generic rules for running package specific rules in appropriate subdir
+$(addsuffix -%,$(PACKAGES)):
+	@pkg=$$(echo '$@' | cut -f1 -d'-'); \
+	echo "$$pkg:"; \
+	$(MAKE) -C $$pkg $(MAKE_OPTS) $*
+	@echo
+
+.PHONY: all clean clean-all dist-clean $(PACKAGES)
