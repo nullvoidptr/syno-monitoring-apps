@@ -1,0 +1,20 @@
+- allow comments in JSON files by stripping lines starting with # during install ?
+- Details in README.md
+- Add grafana and telegraf
+- Add build-from-source capability?
+- ARM based package support
+- git integration:
+    - check for clean repo before release build
+    - auto tagging of release build
+- influxdb
+    - wizard for port
+    - wizard to delete data files on uninstall
+    - syslog config
+    - /usr/local/bin for executables (via /usr/local linker)
+        - allow calling influx CLI without modifying PATH
+    - web interface for showing some stats?
+- GPG signing
+- data share
+    - is it better to use  https://developer.synology.com/developer-guide/resource_acquisition/data_share.html
+      than a standard directory in volume?
+

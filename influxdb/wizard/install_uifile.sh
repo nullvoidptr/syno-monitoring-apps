@@ -22,8 +22,20 @@ cat > ${SYNOPKG_TEMP_LOGFILE} <<EOF
             "desc": "InfluxDB Data Directory",
             "defaultValue": "${SYNOPKG_PKGDEST_VOL}/data/${SYNOPKG_PKGNAME}"
         }]
+    },
+    {
+        "type": "textfield",
+        "subitems" : [{
+            "key": "INFLUXDB_PORT",
+            "desc": "InfluxDB port",
+            "defaultValue": 8086,
+            "validator": {
+                "regex": {
+                    "expr": "/^[0-9]+$/",
+                    "errorText": "Error: Must be a number"
+                }
+            }
+        }]
     }]
 }]
 EOF
-
-env >> /volume1/install_env
