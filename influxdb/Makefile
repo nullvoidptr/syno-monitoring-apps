@@ -19,8 +19,13 @@ PKG_INFO_DESCRIPTION := \
 # Require 6.0-5914 to support data share resource
 # PKG_INFO_OS_MIN_VER := 6.0-5914
 
-# Override with non-zero value to fail if MD5 not found
-BUILD_FORCE_MD5_CHECK ?= 0
+# Override with non-zero value to fail if checksum not found
+BUILD_FORCE_CHECKSUM ?= 0
+
+# Checksum info
+CHECKSUM_HASH := MD5
+CHECKSUM_BIN := md5sum
+CHECKSUM_FILE := MD5SUMS
 
 ifeq ($(PKG_ARCH),x86_64)
   PKG_DOWNLOAD_ARCH := amd64
@@ -29,7 +34,7 @@ else
 endif
 
 PKG_TARBALL := influxdb-$(PKG_VERSION)$(PKG_STATIC)_linux_$(PKG_DOWNLOAD_ARCH).tar.gz
-INFLUXDB_URL := https://dl.influxdata.com/influxdb/releases/$(PKG_TARBALL)
+TARBALL_URL := https://dl.influxdata.com/influxdb/releases/$(PKG_TARBALL)
 
 PKG_ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -39,23 +44,23 @@ ifneq ($(BUILD_VERBOSE),1)
 WGET_QUIET:="--quiet"
 endif
 
-$(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/MD5SUMS
+$(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/$(CHECKSUM_FILE)
 	@echo " - Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
-	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL) $(INFLUXDB_URL)
+	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL) $(TARBALL_URL)
 	@# wget sets modify time to time fetched from server
 	@# 'touch' the file to ensure make handles updated file correctly
 	@# otherwise will download each time make is run
 	$(Q) touch $(TARBALL_DIR)/$(PKG_TARBALL)
-	$(Q) md5=$$(grep '^$(INFLUXDB_URL)' $(PKG_ROOT_DIR)/MD5SUMS | awk '{print $$2}' | head -n1 ); \
-	  if [ -n "$$md5" ]; then \
-	    echo " - Verifying MD5 checksum for downloaded tarball"; \
-	    echo "$$md5  $(TARBALL_DIR)/$(PKG_TARBALL)" | md5sum -c >/dev/null 2>&1; \
+	$(Q) cksum=$$(grep '^$(TARBALL_URL)' $(PKG_ROOT_DIR)/$(CHECKSUM_FILE) | awk '{print $$2}' | head -n1 ); \
+	  if [ -n "$$cksum" ]; then \
+	    echo " - Verifying $(CHECKSUM_HASH) checksum for downloaded tarball"; \
+	    echo "$$cksum  $(TARBALL_DIR)/$(PKG_TARBALL)" | $(CHECKSUM_BIN) -c > /dev/null 1>&1; \
 		if [ $$? -ne 0 ]; then \
-		  echo "MD5 checksum mismatch for $(PKG_TARBALL)"; \
+		  echo "$(CHECKSUM_HASH) checksum mismatch for $(PKG_TARBALL)"; \
 		  exit 1; \
 		 fi; \
       else \
-	    echo "No matching MD5 checksum found for $(PKG_TARBALL)" && exit $(BUILD_FORCE_MD5_CHECK);  \
+	    echo "No matching $(CHECKSUM_HASH) checksum found for $(PKG_TARBALL)" && exit $(BUILD_FORCE_CHECKSUM);  \
 	  fi
 
 
