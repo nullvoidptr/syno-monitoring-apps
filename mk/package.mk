@@ -72,9 +72,9 @@ PKG_INFO_FILE := $(BUILD_DIR)/INFO
 
 _REQUIRED_SCRIPTS:= preinst postinst preuninst postuninst preupgrade postupgrade start-stop-status
 PKG_SCRIPT_FILES := $(addprefix $(PKG_ROOT_DIR)/scripts/, $(_REQUIRED_SCRIPTS))
-PKG_ICON_FILES := $(shell ls $(PKG_ROOT_DIR)/icons/PACKAGE_ICON*.PNG)
-PKG_CONF_FILES := $(shell ls $(PKG_ROOT_DIR)/conf/*)
-PKG_WIZARD_FILES := $(shell ls $(PKG_ROOT_DIR)/wizard/*)
+PKG_ICON_FILES := $(shell ls $(PKG_ROOT_DIR)/icons/PACKAGE_ICON*.PNG 2>/dev/null)
+PKG_CONF_FILES := $(shell ls $(PKG_ROOT_DIR)/conf/* 2>/dev/null)
+PKG_WIZARD_FILES := $(shell ls $(PKG_ROOT_DIR)/wizard/* 2>/dev/null)
 
 
 DEST_PACKAGE := $(PKG_NAME)-$(PKG_ARCH)-$(PKG_VERSION)-$(PKG_RELEASE).spk
