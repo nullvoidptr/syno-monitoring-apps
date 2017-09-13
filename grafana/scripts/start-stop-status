@@ -1,3 +1,153 @@
 #!/bin/bash
 
 # Copyright (c) 2017, James Bowen, All Rights Reserved
+
+# Package specific username is same as package name
+PKG_NAME=${SYNOPKG_PKGNAME:-grafana}
+USER=${PKG_NAME}
+
+# Location of installed package contents
+PKG_DIR="/var/packages/${PKG_NAME}"
+
+# Log file for use during package manager operations
+LOG_FILE=${SYNOPKG_TEMP_LOGFILE}
+
+# Server executable
+DAEMON=${PKG_DIR}/target/bin/grafana-server
+
+# Configuration file
+CONFIG_FILE=${PKG_DIR}/etc/config.ini
+
+# PID file
+PID_FILE=/var/run/${PKG_NAME}/$(basename ${DAEMON}).pid
+
+
+
+function log_msg() {
+    if [ -n "$LOG_FILE" ]; then
+        echo "$@" >>$LOG_FILE
+    else
+        echo "$@" >&2
+    fi
+}
+
+function error() {
+    local rc=$1
+    shift
+    log_msg "ERROR: $@"
+    exit $rc
+}
+
+# Daemon name, where is the actual executable If the daemon is not
+# there, then exit.
+if [ ! -x $DAEMON ]; then
+    error 1 "Executable $DAEMON does not exist!"
+fi
+
+# PID file for the daemon
+PID_DIR=`dirname ${PID_FILE}`
+if [ ! -d "${PID_DIR}" ]; then
+    # NOTE: may require super-user privileges
+    mkdir -p ${PID_DIR}
+    chown $USER:$GROUP ${PID_DIR}
+fi
+
+
+function start() {
+
+    # Check if already running
+    if [ -s "${PID_FILE}" ]; then
+        pid="$(cat ${PID_FILE})"
+        if kill -0 "$pid" &>/dev/null; then
+            log "$NAME process already running"
+            return 0
+        fi
+    else
+        touch ${PID_FILE} &>/dev/null
+        if [ $? -ne 0 ]; then
+            error 1 "${PID_FILE} not writeable, check permissions."
+        fi
+    fi
+
+    # Verify config file exists
+    if [ ! -r "$CONFIG_FILE" ]; then
+        error 1 "Cannot read configuration file $CONFIG_FILE."
+    fi
+
+    # Start daemon in background
+    cmd="$DAEMON -config $CONFIG_FILE -homepath ${PKG_DIR}/target -pidfile ${PID_FILE} >/dev/null 2>&1 &"
+    su -s /bin/sh -c "$cmd" $USER
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        error $rc "Could not start process $PKG_NAME (rc=$rc)."
+    fi
+    sleep 2
+
+    # Check process running
+    if [ -s "${PID_FILE}" ]; then
+        if kill -0 $(cat ${PID_FILE}) &>/dev/null; then
+            # PID up, service running
+            log_msg "${PKG_NAME} process was started"
+            return 0
+        else
+            rm -f "${PID_FILE}"
+            error 1 "Could not start process $PKG_NAME"
+        fi
+    fi
+    error 1 "$NAME process was unable to start"
+}
+
+function stop() {
+    return
+}
+
+function status() {
+    return
+}
+
+function log() {
+    return
+}
+
+
+case $1 in
+    start)
+        start
+        ;;
+
+    stop)
+        stop
+        ;;
+
+    restart)
+        restart
+        ;;
+
+    status)
+        status
+        ;;
+
+    version)
+        $DAEMON version
+        ;;
+
+    log)
+        log
+        ;;
+
+    prestart)
+        # Zero return value allows user to start package
+        exit 0
+        ;;
+
+    prestop)
+        # Zero return value allows user to stop package
+        exit 0
+        ;;
+
+    *)
+        # For invalid arguments, print the usage message.
+        echo "Usage: $0 {start|stop|status|version|log|prestart|prestop}"
+        exit 2
+        ;;
+esac

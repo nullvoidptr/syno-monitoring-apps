@@ -73,4 +73,4 @@ $(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
 	@echo " - Installing $(PKG_NAME) to temp directory"
 	$(Q) rm -rf $(INNER_PKG_DIR)
 	$(Q) install -d $(INNER_PKG_DIR)
-	$(Q) tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -C $(INNER_PKG_DIR)
+	$(Q) tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -C $(INNER_PKG_DIR) --strip-components=1
