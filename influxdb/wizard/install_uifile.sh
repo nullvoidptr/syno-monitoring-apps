@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# TODO: Ask for port
 # TODO: Ask for username / password
 
 # NOTE: SYNOPKG_PKGDEST and SYNOPKG_PKGDEST_VOL are not set when UI files

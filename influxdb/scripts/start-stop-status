@@ -18,6 +18,7 @@ GROUP=${NAME}
 PKG_DIR="/var/packages/${NAME}"
 
 # Log file
+# NOTE: Placing this within ${PKG_DIR} means the log is deleted on upgrade
 LOG_FILE="${PKG_DIR}/target/log/influxd.log"
 
 # Check for sudo or root privileges before continuing
