@@ -46,7 +46,9 @@ endif
 
 $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/$(CHECKSUM_FILE)
 	@echo " - Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
-	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL) $(TARBALL_URL)
+	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL).download $(TARBALL_URL)
+	@# wget will leave empty file on failure so download to temp file and rename on success
+	$(Q) mv $(TARBALL_DIR)/$(PKG_TARBALL).download $(TARBALL_DIR)/$(PKG_TARBALL)
 	@# wget sets modify time to time fetched from server
 	@# 'touch' the file to ensure make handles updated file correctly
 	@# otherwise will download each time make is run
@@ -72,10 +74,11 @@ install: $(INNER_PKG_DIR)
 
 $(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
 	@echo " - Installing $(PKG_NAME) to temp directory"
-	$(Q) rm -rf $(INNER_PKG_DIR)
-	$(Q) install -d $(INNER_PKG_DIR)
+	$(Q) rm -rf $(INNER_PKG_DIR) $(INNER_PKG_DIR).tmp
+	$(Q) install -d $(INNER_PKG_DIR).tmp
 	$(Q) install -d $(INNER_PKG_DIR)/bin
 	$(Q) tar_root=$$(tar tzf $(TARBALL_DIR)/$(PKG_TARBALL) | grep "/[^/]*/$$" | head -n1); \
 	  tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -O  $${tar_root}usr/bin/influxd > $(INNER_PKG_DIR)/bin/influxd; \
 	  tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -O  $${tar_root}usr/bin/influx > $(INNER_PKG_DIR)/bin/influx
 	$(Q) chmod 755 $(INNER_PKG_DIR)/bin/influx*
+	$(Q) mv $(INNER_PKG_DIR).tmp $(INNER_PKG_DIR)
