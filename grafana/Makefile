@@ -27,13 +27,13 @@ CHECKSUM_BIN := sha256sum
 CHECKSUM_FILE := SHA256SUMS
 
 ifeq ($(PKG_ARCH),x86_64)
-  PKG_DOWNLOAD_ARCH := x64
+  PKG_DOWNLOAD_ARCH := amd64
 else
   $(error Architecture '$(PKG_ARCH)' not supported for $(PKG_NAME))
 endif
 
 PKG_TARBALL := grafana-$(PKG_VERSION)$(PKG_STATIC).linux-$(PKG_DOWNLOAD_ARCH).tar.gz
-TARBALL_URL := https://s3-us-west-2.amazonaws.com/grafana-releases/release/$(PKG_TARBALL)
+TARBALL_URL := https://dl.grafana.com/oss/release/$(PKG_TARBALL)
 
 PKG_ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -45,7 +45,10 @@ endif
 
 $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/$(CHECKSUM_FILE)
 	@echo " - Fetching $(PKG_NAME) tarball (version: $(PKG_VERSION), arch: $(PKG_ARCH))"
-	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL) $(TARBALL_URL)
+	@echo "   from $(TARBALL_URL)"
+	$(Q) wget $(WGET_QUIET) -O $(TARBALL_DIR)/$(PKG_TARBALL).download $(TARBALL_URL)
+	@# wget will leave empty file on failure so download to temp file and rename on success
+	$(Q) mv $(TARBALL_DIR)/$(PKG_TARBALL).download $(TARBALL_DIR)/$(PKG_TARBALL)
 	@# wget sets modify time to time fetched from server
 	@# 'touch' the file to ensure make handles updated file correctly
 	@# otherwise will download each time make is run
@@ -67,10 +70,9 @@ $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/$(CHECKSUM_FILE)
 build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 
 # Install copies files into target directory
-install: $(INNER_PKG_DIR)
-
-$(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
+install: $(TARBALL_DIR)/$(PKG_TARBALL)
 	@echo " - Installing $(PKG_NAME) to temp directory"
-	$(Q) rm -rf $(INNER_PKG_DIR)
-	$(Q) install -d $(INNER_PKG_DIR)
-	$(Q) tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -C $(INNER_PKG_DIR) --strip-components=1
+	$(Q) rm -rf $(INNER_PKG_DIR) $(INNER_PKG_DIR).tmp
+	$(Q) install -d $(INNER_PKG_DIR).tmp
+	$(Q) tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -C $(INNER_PKG_DIR).tmp --strip-components=1
+	$(Q) mv $(INNER_PKG_DIR).tmp $(INNER_PKG_DIR)
