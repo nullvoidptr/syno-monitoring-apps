@@ -125,7 +125,7 @@ function start() {
     fi
 
     # Sleep to verify process is still up
-    sleep 1
+    sleep 5
     if [ -f $PIDFILE ]; then
         # PIDFILE exists
         if kill -0 $(cat $PIDFILE) &>/dev/null; then
