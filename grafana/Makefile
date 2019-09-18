@@ -3,10 +3,10 @@
 PKG_NAME := grafana
 
 # Override via environment to build other version/arch
-PKG_VERSION ?= 4.4.3
+PKG_VERSION ?= 6.3.5
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 1-beta
+PKG_RELEASE := 2-beta
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "Grafana"
