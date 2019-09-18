@@ -63,7 +63,7 @@ function start() {
             return 0
         fi
     else
-        touch ${PID_FILE} &>/dev/null
+        su -s /bin/sh -c "touch ${PID_FILE} &>/dev/null" $USER
         if [ $? -ne 0 ]; then
             error 1 "${PID_FILE} not writeable, check permissions."
         fi
@@ -98,15 +98,63 @@ function start() {
 }
 
 function stop() {
-    return
+    # Stop the daemon.
+    if [ -f $PID_FILE ]; then
+        local PID="$(cat $PID_FILE)"
+        if kill -0 $PID &>/dev/null; then
+            echo "Stopping $NAME..."
+            # Process still up, send SIGTERM and remove PID_FILE
+            kill -s TERM $PID &>/dev/null && rm -f "$PID_FILE" &>/dev/null
+            n=0
+            while true; do
+                # Enter loop to ensure process is stopped
+                kill -0 $PID &>/dev/null
+                if [ "$?" != "0" ]; then
+                    # Process stopped, break from loop
+                    log_msg "$NAME process was stopped"
+                    return 0
+                fi
+
+                # Process still up after signal, sleep and wait
+                sleep 1
+                n=$(expr $n + 1)
+                if [ $n -eq 30 ]; then
+                    # After 30 seconds, send SIGKILL
+                    echo "Timeout exceeded, sending SIGKILL..."
+                    kill -s KILL $PID &>/dev/null
+                elif [ $? -eq 40 ]; then
+                    # After 40 seconds, error out
+                    error 1 "could not stop $NAME process"
+                fi
+            done
+        fi
+    fi
+    log_msg "$NAME process already stopped"
+}
+
+function restart() {
+    # Restart the daemon.
+    stop
+    start
 }
 
 function status() {
-    return
+    # Check the status of the process.
+    if [ -f $PID_FILE ]; then
+        PID="$(cat $PID_FILE)"
+        if kill -0 $PID &>/dev/null; then
+            log_msg "$NAME process is running"
+            exit 0
+        else
+            # PID file present but no matching process
+            error 1 "$NAME process is not running (stale PID file)"
+        fi
+    fi
+    error 3 "$NAME process is not running"
 }
 
 function log() {
-    return
+    echo ${LOG_FILE}
 }
 
 
