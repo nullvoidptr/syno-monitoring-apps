@@ -1,4 +1,5 @@
 {
     "usr-local-linker": {
         "bin": ["bin/influx", "bin/influxd"]
+    }
 }
