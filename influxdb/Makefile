@@ -3,10 +3,10 @@
 PKG_NAME := influxDB
 
 # Override via environment to build other version/arch
-PKG_VERSION ?= 1.3.4
+PKG_VERSION ?= 1.7.8
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 5
+PKG_RELEASE := 7
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "InfluxDB"
