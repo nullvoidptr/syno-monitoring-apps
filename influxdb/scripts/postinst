@@ -37,6 +37,7 @@ if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
 
 [http]
   bind-address = ":${data_port}"
+  log-enabled = false
 
 END_OF_CONFIG
 
