@@ -6,7 +6,7 @@ PKG_NAME := influxDB
 PKG_VERSION ?= 1.7.8
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 7
+PKG_RELEASE := 8
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "InfluxDB"
