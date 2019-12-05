@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2017, James Bowen, All Rights Reserved
+# Copyright (c) 2019, James Bowen, All Rights Reserved
 
 # Output to stderr if no logfile passed
 SYNOPKG_TEMP_LOGFILE=${SYNOPKG_TEMP_LOGFILE:-"/dev/stderr"}
@@ -13,19 +13,6 @@ for var in SYNOPKG_PKG_STATUS SYNOPKG_PKGDEST_VOL SYNOPKG_PKGNAME; do
         exit 1
     fi
 done
-
-
-# Create symlinks for startup/shutdown
-tgt="/var/packages/${SYNOPKG_PKGNAME}/scripts/start-stop-status"
-link="/usr/local/etc/rc.d/${SYNOPKG_PKGNAME}.sh"
-
-if [ ! -e "${link}" ]; then
-    err=$(ln -s ${tgt} ${link} 2>&1)
-    if [ $? -ne 0 ]; then
-        echo "ERROR: Could not create symlink: ${err}" >> ${SYNOPKG_TEMP_LOGFILE}
-        exit 1
-    fi
-fi
 
 # Perform the following only during initial installation
 if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
@@ -52,6 +39,7 @@ if [ "${SYNOPKG_PKG_STATUS}" = "INSTALL" ]; then
   bind-address = ":${data_port}"
 
 END_OF_CONFIG
+
     if [ $? -ne 0 ]; then
         echo "ERROR: Could not create config file." >> ${SYNOPKG_TEMP_LOGFILE}
         exit 2
