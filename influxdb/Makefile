@@ -3,10 +3,10 @@
 PKG_NAME := influxDB
 
 # Override via environment to build other version/arch
-PKG_VERSION ?= 1.7.8
+PKG_VERSION ?= 1.7.9
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 8
+PKG_RELEASE := 1
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "InfluxDB"
@@ -23,9 +23,9 @@ PKG_INFO_DESCRIPTION := \
 BUILD_FORCE_CHECKSUM ?= 0
 
 # Checksum info
-CHECKSUM_HASH := MD5
-CHECKSUM_BIN := md5sum
-CHECKSUM_FILE := MD5SUMS
+CHECKSUM_HASH := SHA256
+CHECKSUM_BIN := sha256sum
+CHECKSUM_FILE := SHA256SUMS
 
 ifeq ($(PKG_ARCH),x86_64)
   PKG_DOWNLOAD_ARCH := amd64
