@@ -7,7 +7,7 @@
 # by searching for '@appstore' directories in volumes
 
 if [ -z "${SYNOPKG_PKGDEST_VOL}" ]; then
-    SYNOPKG_PKGDEST_VOL=$(dirname $(readlink -f /volume[0-9*]/@appstore 2>/dev/null) 2>/dev/null)
+    SYNOPKG_PKGDEST_VOL=$(dirname $(readlink -f /volume[0-9*]/@appstore 2>/dev/null | head -n1 ) 2>/dev/null)
 fi
 
 cat > ${SYNOPKG_TEMP_LOGFILE} <<EOF
