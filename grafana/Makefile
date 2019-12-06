@@ -3,7 +3,7 @@
 PKG_NAME := grafana
 
 # Override via environment to build other version/arch
-PKG_VERSION ?= 6.3.5
+PKG_VERSION ?= 6.5.0
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
 PKG_RELEASE := 2-beta
