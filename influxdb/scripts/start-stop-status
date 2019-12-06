@@ -94,7 +94,7 @@ start_daemon() {
     local CMD="$DAEMON -pidfile $PID_FILE -config $CONFIG $INFLUXD_OPTS >>/dev/null 2>>$LOG_FILE &"
     su -s /bin/sh -c "$CMD" $USER
 
-    wait_for_status 0
+    wait_for_status 0 60
     if [ $? -ne 0 ]; then
         error 1 "Unable to start $NAME. Timeout exceeded."
     fi
@@ -149,7 +149,7 @@ daemon_status() {
 wait_for_status() {
     timeout=$2
     # default value: 20 seconds
-    counter=${timeout:=20}
+    counter=${timeout:-20}
     while [ ${counter} -gt 0 ]; do
         daemon_status
         [ $? -eq $1 ] && return
