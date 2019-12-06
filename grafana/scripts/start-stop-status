@@ -56,10 +56,10 @@ fi
 function start() {
 
     # Check if already running
-    if [ -s "${PID_FILE}" ]; then
+    if [ -f "${PID_FILE}" ]; then
         pid="$(cat ${PID_FILE})"
         if kill -0 "$pid" &>/dev/null; then
-            log "$NAME process already running"
+            log "$PKG_NAME process already running"
             return 0
         fi
     else
@@ -94,7 +94,7 @@ function start() {
             error 1 "Could not start process $PKG_NAME"
         fi
     fi
-    error 1 "$NAME process was unable to start"
+    error 1 "$PKG_NAME process was unable to start"
 }
 
 function stop() {
@@ -102,7 +102,7 @@ function stop() {
     if [ -f $PID_FILE ]; then
         local PID="$(cat $PID_FILE)"
         if kill -0 $PID &>/dev/null; then
-            echo "Stopping $NAME..."
+            echo "Stopping $PKG_NAME..."
             # Process still up, send SIGTERM and remove PID_FILE
             kill -s TERM $PID &>/dev/null && rm -f "$PID_FILE" &>/dev/null
             n=0
@@ -111,7 +111,7 @@ function stop() {
                 kill -0 $PID &>/dev/null
                 if [ "$?" != "0" ]; then
                     # Process stopped, break from loop
-                    log_msg "$NAME process was stopped"
+                    log_msg "$PKG_NAME process was stopped"
                     return 0
                 fi
 
@@ -124,12 +124,12 @@ function stop() {
                     kill -s KILL $PID &>/dev/null
                 elif [ $? -eq 40 ]; then
                     # After 40 seconds, error out
-                    error 1 "could not stop $NAME process"
+                    error 1 "could not stop $PKG_NAME process"
                 fi
             done
         fi
     fi
-    log_msg "$NAME process already stopped"
+    log_msg "$PKG_NAME process already stopped"
 }
 
 function restart() {
@@ -143,14 +143,14 @@ function status() {
     if [ -f $PID_FILE ]; then
         PID="$(cat $PID_FILE)"
         if kill -0 $PID &>/dev/null; then
-            log_msg "$NAME process is running"
+            log_msg "$PKG_NAME process is running"
             exit 0
         else
             # PID file present but no matching process
-            error 1 "$NAME process is not running (stale PID file)"
+            error 1 "$PKG_NAME process is not running (stale PID file)"
         fi
     fi
-    error 3 "$NAME process is not running"
+    error 3 "$PKG_NAME process is not running"
 }
 
 function log() {
