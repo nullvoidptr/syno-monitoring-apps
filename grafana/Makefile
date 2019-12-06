@@ -6,7 +6,7 @@ PKG_NAME := grafana
 PKG_VERSION ?= 6.5.0
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 2-beta
+PKG_RELEASE := 4
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "Grafana"
@@ -14,6 +14,12 @@ PKG_INFO_MAINTAINER := "James Bowen"
 PKG_INFO_DESCRIPTION := \
 	Grafana is an open source monitoring app compatible with InfluxDB and other \
 	time series databases. See https://grafana.com for more info.
+
+# Open up browser to port 3000 from Package Center
+# TODO - how do we reconfigure if user chooses different port?
+PKG_INFO_ADMINPORT := 3000
+
+PKG_INFO_DSMUIDIR="ui"
 
 # Require 6.0-5914 to support data share resource
 # PKG_INFO_OS_MIN_VER := 6.0-5914
@@ -76,3 +82,6 @@ install: $(TARBALL_DIR)/$(PKG_TARBALL)
 	$(Q) install -d $(INNER_PKG_DIR).tmp
 	$(Q) tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -C $(INNER_PKG_DIR).tmp --strip-components=1
 	$(Q) mv $(INNER_PKG_DIR).tmp $(INNER_PKG_DIR)
+	$(Q) install -d $(INNER_PKG_DIR)/ui/images
+	$(Q) install -m 644 ui/config $(INNER_PKG_DIR)/ui
+	$(Q) install -m 644 icons/PACKAGE_ICON_256.PNG $(INNER_PKG_DIR)/ui/images/grafana_256.png
