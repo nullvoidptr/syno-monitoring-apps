@@ -1,6 +1,6 @@
 # Top level Makefile
 
-PACKAGES:=influxdb
+PACKAGES:=influxdb grafana
 
 ifneq ($(BUILD_VERBOSE),1)
 MAKE_OPTS:=--no-print-directory
