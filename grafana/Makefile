@@ -71,12 +71,7 @@ $(TARBALL_DIR)/$(PKG_TARBALL): $(TARBALL_DIR) $(PKG_ROOT_DIR)/$(CHECKSUM_FILE)
 	    echo "No matching $(CHECKSUM_HASH) checksum found for $(PKG_TARBALL)" && exit $(BUILD_FORCE_CHECKSUM);  \
 	  fi
 
-
-# Build is a no-op as we download pre-compiled binaries from the web
-build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
-
-# Install copies files into target directory
-install: $(TARBALL_DIR)/$(PKG_TARBALL)
+$(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
 	@echo " - Installing $(PKG_NAME) to temp directory"
 	$(Q) rm -rf $(INNER_PKG_DIR) $(INNER_PKG_DIR).tmp
 	$(Q) install -d $(INNER_PKG_DIR).tmp

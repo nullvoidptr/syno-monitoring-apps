@@ -92,6 +92,9 @@ fetch: $(TARBALL_DIR)/$(PKG_TARBALL)
 # Build is a no-op as we download pre-compiled binaries from the web
 build: $(BUILD_DIR) $(TARBALL_DIR)/$(PKG_TARBALL)
 
+# Install copies files into target directory
+install: $(INNER_PKG_DIR)
+
 # Create the inner package tarball from contents of INNER_PKG_DIR
 $(BUILD_DIR)/package.tgz: $(shell find $(INNER_PKG_DIR) -type f 2>/dev/null)
 	@echo " - Generating package.tgz"
@@ -117,7 +120,7 @@ $(PKG_INFO_FILE): $(BUILD_DIR)/package.tgz
 
 
 # Build the .spk package
-package: $(DEST_PACKAGE)
+package: build install $(DEST_PACKAGE)
 
 $(DEST_PACKAGE): $(BUILD_DIR)/package.tgz $(PKG_SCRIPT_FILES) $(PKG_ICON_FILES) $(PKG_INFO_FILE) $(PKG_CONF_FILES) $(PKG_WIZARD_FILES)
 	@echo " - Building $(DEST_PACKAGE)"
