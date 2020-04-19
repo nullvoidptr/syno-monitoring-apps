@@ -1,0 +1,59 @@
+[
+  {
+    "step_title": "InfluxDB Config",
+    "items": [
+      {
+        "type": "textfield",
+        "desc": "Telegraf is configured to use InfluxDB to collect its output. Please provide the following configuration information:",
+        "subitems": [
+          {
+            "key": "TELEGRAF_INFLUXDB_URL",
+            "desc": "InfluxDB URL",
+            "defaultValue": "http://127.0.0.1:8086"
+          }
+        ]
+      },
+      {
+        "type": "textfield",
+        "subitems": [
+          {
+            "key": "TELEGRAF_INFLUXDB_DBNAME",
+            "desc": "Database Name",
+            "defaultValue": "telegraf"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "step_title": "Input Plugins",
+    "items": [
+      {
+        "type": "multiselect",
+        "desc": "Select one or more Telegraf input plugins to enable.",
+        "subitems": [
+          {
+            "key": "TELEGRAF_INPUT_CPU",
+            "desc": "CPU: Read metrics about cpu usage"
+          },
+          {
+            "key": "TELEGRAF_INPUT_DISK",
+            "desc": "Disk: Read metrics about disk usage by mount point"
+          },
+          {
+            "key": "TELEGRAF_INPUT_DISKIO",
+            "desc": "Disk I/O: Read metrics about disk IO by device"
+          },
+          {
+            "key": "TELEGRAF_INPUT_KERNEL",
+            "desc": "Kernel: Get kernel statistics from /proc/stat"
+          },
+          {
+            "key": "TELEGRAF_INPUT_MEM",
+            "desc": "Mem: Read metrics about memory usage"
+          }
+        ]
+      }
+    ]
+  }
+]

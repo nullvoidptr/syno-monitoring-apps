@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Copyright (c) 2020, James Bowen, All Rights Reserved
+
+# Remove symlinks (if exist)
+script_link="${SYNOPKG_PKGDEST}/scripts/start-stop-status"
+if [ -h "${script_link}" ]; then
+    rm "${script_link}"
+fi
+
+# Remove config file (only if not upgrading)
+# TODO
