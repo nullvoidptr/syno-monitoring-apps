@@ -6,7 +6,7 @@ PKG_NAME := telegraf
 PKG_VERSION ?= 1.14.1
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
-PKG_RELEASE := 1
+PKG_RELEASE := 2
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "Telegraf"
