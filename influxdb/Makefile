@@ -3,14 +3,15 @@
 PKG_NAME := influxDB
 
 # Override via environment to build other version/arch
-PKG_VERSION ?= 1.7.9
+PKG_VERSION ?= 1.8.0
 PKG_ARCH ?= x86_64
 PKG_STATIC ?=
 PKG_RELEASE := 1
 
 # NOTE: PKG_INFO vars must have strings in double quotes but other values unquoted
 PKG_INFO_DISPLAYNAME := "InfluxDB"
-PKG_INFO_MAINTAINER := "James Bowen"
+PKG_INFO_MAINTAINER := "InfluxData"
+PKG_INFO_DISTRIBUTOR := "James Bowen (Synology DSM Package)"
 PKG_INFO_DESCRIPTION := \
 	"InfluxDB is used as a data store for any use case involving large amounts \
 	 of timestamped data, including DevOps monitoring, application metrics, IoT \
