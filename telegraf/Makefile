@@ -70,5 +70,5 @@ $(INNER_PKG_DIR): $(TARBALL_DIR)/$(PKG_TARBALL)
 	  tar xzf $(TARBALL_DIR)/$(PKG_TARBALL) -O  $${tar_root}usr/bin/telegraf > $(INNER_PKG_DIR)/bin/telegraf
 	$(Q) chmod 755 $(INNER_PKG_DIR)/bin/telegraf
 	$(Q) install -d $(INNER_PKG_DIR)/etc $(INNER_PKG_DIR)/etc/telegraf.d
-	$(Q) install etc/telegraf.conf $(INNER_PKG_DIR)/etc/telegraf.conf
-	$(Q) install etc/telegraf.d/* $(INNER_PKG_DIR)/etc/telegraf.d
+	$(Q) install -m 0644 etc/telegraf.conf $(INNER_PKG_DIR)/etc/telegraf.conf
+	$(Q) install -m 0644 etc/telegraf.d/* $(INNER_PKG_DIR)/etc/telegraf.d
