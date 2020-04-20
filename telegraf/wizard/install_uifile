@@ -30,27 +30,63 @@
     "items": [
       {
         "type": "multiselect",
-        "desc": "Select one or more Telegraf input plugins to enable.",
+        "desc": "Select one or more Telegraf input plugins to enable.<br>Additional plugins can be enabled in config files after installation.",
         "subitems": [
           {
             "key": "TELEGRAF_INPUT_CPU",
-            "desc": "CPU: Read metrics about cpu usage"
+            "desc": "<B>CPU</B>: Read metrics about cpu usage",
+            "defaultValue": true
           },
           {
             "key": "TELEGRAF_INPUT_DISK",
-            "desc": "Disk: Read metrics about disk usage by mount point"
+            "desc": "<B>Disk</B>: Read metrics about disk usage by mount point",
+            "defaultValue": true
           },
           {
             "key": "TELEGRAF_INPUT_DISKIO",
-            "desc": "Disk I/O: Read metrics about disk IO by device"
+            "desc": "<B>Disk I/O</B>: Read metrics about disk IO by device",
+            "defaultValue": true
+          },
+          {
+            "key": "TELEGRAF_INPUT_INTERNAL",
+            "desc": "<B>Internal</B>: Collect statistics about telegraf itself"
           },
           {
             "key": "TELEGRAF_INPUT_KERNEL",
-            "desc": "Kernel: Get kernel statistics from /proc/stat"
+            "desc": "<B>Kernel</B>: Get kernel statistics from /proc/stat",
+            "defaultValue": true
           },
           {
             "key": "TELEGRAF_INPUT_MEM",
-            "desc": "Mem: Read metrics about memory usage"
+            "desc": "<B>Mem</B>: Read metrics about memory usage",
+            "defaultValue": true
+          },
+          {
+            "key": "TELEGRAF_INPUT_PROCESSES",
+            "desc": "<B>Processes</B>: Get the number of processes and group them by status",
+            "defaultValue": true
+          },
+          {
+            "key": "TELEGRAF_INPUT_PROCSTAT_Grafana",
+            "desc": "<B>Procstat (grafana)</B>: Monitor Grafana CPU and memory usage"
+          },
+          {
+            "key": "TELEGRAF_INPUT_PROCSTAT_INFLUXDB",
+            "desc": "<B>Procstat (influxDB)</B>: Monitor InfluxDB CPU and memory usage"
+          },
+          {
+            "key": "TELEGRAF_INPUT_PROCSTAT_TELEGRAF",
+            "desc": "<B>Procstat (telegraf)</B>: Monitor Telegraf CPU and memory usage"
+          },
+          {
+            "key": "TELEGRAF_INPUT_SWAP",
+            "desc": "<B>Swap</B>: Read metrics about swap memory usage",
+            "defaultValue": true
+          },
+          {
+            "key": "TELEGRAF_INPUT_SYSTEM",
+            "desc": "<B>System</B>: Read metrics about system load and uptime",
+            "defaultValue": true
           }
         ]
       }
